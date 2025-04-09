@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Magma-over 21 - Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #c0392b; }
+    .question { margin: 20px 0; font-weight: bold; }
+    button { margin: 5px; padding: 10px 15px; border: none; border-radius: 5px; background: #2980b9; color: white; cursor: pointer; }
+    button:hover { background: #3498db; }
+    .score { margin-top: 20px; font-weight: bold; }
+    #rejouer, #niveau-suivant { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Magma-over 21</h1>
+    <p id="intro">Bienvenue ! Répondez à 5 questions par niveau. Maximum 2 erreurs autorisées. Bonne chance !</p>
+    <div id="quiz">
+      <p id="question"></p>
+      <div id="options"></div>
+    </div>
+    <p class="score" id="score"></p>
+    <button id="niveau-suivant" onclick="suivant()">Niveau suivant</button>
+    <button id="rejouer" onclick="restart()">Rejouer</button>
+  </div>
+
+  <script>
+    const niveaux = [
+      [
+        { q: "La Côte d'Ivoire est située en Afrique de l'Ouest.", a: "Oui", type: "YN" },
+        { q: "Le président actuel de la Côte d'Ivoire s'appelle Laurent Gbagbo.", a: "Non", type: "YN" },
+        { q: "Le cacao est un produit d'exportation majeur de la Côte d'Ivoire.", a: "Oui", type: "YN" },
+        { q: "La mer Méditerranée borde les côtes du Sénégal.", a: "Non", type: "YN" },
+        { q: "Le Swahili est une langue parlée principalement en Afrique de l'Ouest.", a: "Non", type: "YN" }
+      ],
+      [
+        { q: "La ville de Yamoussoukro est la capitale économique de la Côte d'Ivoire.", a: "Non", type: "YN" },
+        { q: "Le président Alassane Ouattara a été élu en 2011.", a: "Oui", type: "YN" },
+        { q: "Le parc national de la Comoé est classé au patrimoine mondial.", a: "Oui", type: "YN" },
+        { q: "La Côte d'Ivoire produit également du coton.", a: "Oui", type: "YN" },
+        { q: "Le Danube traverse la Côte d'Ivoire.", a: "Non", type: "YN" }
+      ],
+      [
+        { q: "Quel est le plus grand pays d'Afrique ?", options: ["Algérie", "Soudan", "Libye", "RDC"], a: "Algérie", type: "MC" },
+        { q: "Quel est le fleuve le plus long d'Afrique ?", options: ["Nil", "Congo", "Limpopo", "Zambèze"], a: "Nil", type: "MC" },
+        { q: "Capitale économique de la Côte d'Ivoire ?", options: ["Abidjan", "Yamoussoukro", "Bouaké", "San Pedro"], a: "Abidjan", type: "MC" },
+        { q: "Plat traditionnel ivoirien à base de riz ?", options: ["Garba", "Attiéké", "Alloco", "Kedjenou"], a: "Garba", type: "MC" },
+        { q: "Quel est le sport le plus populaire en Côte d'Ivoire ?", options: ["Football", "Basketball", "Handball", "Rugby"], a: "Football", type: "MC" }
+      ]
+    ];
+
+    let niveau = 0;
+    let current = 0;
+    let score = 0;
+    let erreurs = 0;
+
+    function showQuestion() {
+      const questionData = niveaux[niveau][current];
+      document.getElementById("question").innerText = `Question ${current + 1}: ${questionData.q}`;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      if (questionData.type === "YN") {
+        ["Oui", "Non"].forEach(opt => {
+          const btn = document.createElement("button");
+          btn.textContent = opt;
+          btn.onclick = () => answer(opt);
+          optionsDiv.appendChild(btn);
+        });
+      } else {
+        questionData.options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.textContent = opt;
+          btn.onclick = () => answer(opt);
+          optionsDiv.appendChild(btn);
+        });
+      }
+    }
+
+    function answer(rep) {
+      const questionData = niveaux[niveau][current];
+      if (rep === questionData.a) {
+        alert("Bonne réponse !");
+        score += 5;
+      } else {
+        alert(`Mauvaise réponse. Bonne réponse : ${questionData.a}`);
+        erreurs++;
+      }
+      current++;
+      if (erreurs >= 2 || current >= 5) endLevel();
+      else showQuestion();
+    }
+
+    function endLevel() {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("score").innerText = `Niveau ${niveau + 1} terminé avec ${score} points.`;
+      if (niveau < niveaux.length - 1 && erreurs < 2) {
+        document.getElementById("niveau-suivant").style.display = "inline-block";
+      }
+      document.getElementById("rejouer").style.display = "inline-block";
+    }
+
+    function suivant() {
+      niveau++;
+      current = 0;
+      erreurs = 0;
+      document.getElementById("score").innerText = "";
+      document.getElementById("niveau-suivant").style.display = "none";
+      document.getElementById("rejouer").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      showQuestion();
+    }
+
+    function restart() {
+      niveau = 0;
+      current = 0;
+      erreurs = 0;
+      score = 0;
+      document.getElementById("score").innerText = "";
+      document.getElementById("rejouer").style.display = "none";
+      document.getElementById("niveau-suivant").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
